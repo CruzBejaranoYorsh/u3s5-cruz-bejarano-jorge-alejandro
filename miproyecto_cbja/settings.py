@@ -42,12 +42,16 @@ else:
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-local-development-key')
-DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,.onrender.com', cast=Csv())
-CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='https://*.onrender.com', cast=Csv())
+DEBUG = config('DEBUG', default=False, cast=bool)
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,testserver,.onrender.com', cast=Csv())
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='https://*.onrender.com,http://localhost:8000,http://127.0.0.1:8000', cast=Csv())
 
 if config('RENDER', default=False, cast=bool):
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 
 # Application definition
@@ -178,6 +182,9 @@ STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
     'staticfiles': {
         'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
     },
@@ -189,7 +196,11 @@ STORAGES = {
 
 MAILERS = {
     'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
+        'BACKEND': (
+            'django.core.mail.backends.console.EmailBackend'
+            if DEBUG
+            else 'django.core.mail.backends.smtp.EmailBackend'
+        ),
     },
 }
 
