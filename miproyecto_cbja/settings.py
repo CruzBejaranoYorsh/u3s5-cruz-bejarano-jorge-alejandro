@@ -204,3 +204,4 @@ MAILERS = {
     },
 }
 
+LOGIN_URL = '/admin/login/'

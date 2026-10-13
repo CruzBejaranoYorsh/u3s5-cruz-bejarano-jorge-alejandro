@@ -1,28 +1,29 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Servicios</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="max-w-2xl mx-auto py-10 px-6">
-  <h1 class="text-2xl font-bold mb-6">Servicios</h1>
+{% extends 'core/base.html' %}
 
+{% block contenido %}
+  <h1 class="text-2xl font-bold mb-6">Servicios</h1>
+  <a href="{% url 'crear_servicio' %}" class="inline-block mb-4 bg-blue-600 text-white px-4 py-2 rounded-lg">+ Nuevo servicio</a>
   <table class="w-full border border-slate-200 rounded-lg overflow-hidden">
     <thead class="bg-slate-100">
       <tr>
         <th class="text-left px-4 py-2">Servicio</th>
         <th class="text-left px-4 py-2">Precio</th>
+        <th class="text-left px-4 py-2">Acciones</th>
       </tr>
     </thead>
     <tbody>
       {% for servicio in servicios %}
-        <tr class="border-t border-slate-200">
-          <td class="px-4 py-2">{{ servicio.titulo }}</td>
-          <td class="px-4 py-2">${{ servicio.precio }}</td>
-        </tr>
+      <tr class="border-t border-slate-200">
+        <td class="px-4 py-2">{{ servicio.titulo }}</td>
+        <td class="px-4 py-2">${{ servicio.precio }}</td>
+        <td class="px-4 py-2">
+          <a href="{% url 'editar_servicio' servicio.pk %}" class="text-blue-600 underline">Editar</a>
+          <a href="{% url 'eliminar_servicio' servicio.pk %}" class="text-red-600 underline ml-3">Eliminar</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="3" class="px-4 py-6 text-center text-slate-500">Todavía no hay servicios.</td></tr>
       {% endfor %}
     </tbody>
   </table>
-</body>
-</html>
+{% endblock %}

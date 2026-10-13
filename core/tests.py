@@ -1,3 +1,80 @@
 from django.test import TestCase
+from django.contrib.auth.models import User
+from django.urls import reverse
 
-# Create your tests here.
+from .models import Servicio
+
+
+class ServicioCrudTests(TestCase):
+    def setUp(self):
+        self.propietario = User.objects.create_user(
+            username='propietario',
+            password='test-password',
+        )
+        self.client.force_login(self.propietario)
+        self.servicio = Servicio.objects.create(
+            propietario=self.propietario,
+            titulo='Servicio inicial',
+            descripcion='Descripción inicial',
+            precio='100.00',
+            categoria='General',
+        )
+
+    def test_crear_servicio(self):
+        response = self.client.post(reverse('crear_servicio'), {
+            'titulo': 'Servicio nuevo',
+            'descripcion': 'Descripción nueva',
+            'precio': '250.50',
+            'categoria': 'Diseño',
+        })
+
+        self.assertRedirects(response, reverse('servicios'))
+        self.assertTrue(Servicio.objects.filter(titulo='Servicio nuevo').exists())
+
+    def test_editar_servicio(self):
+        response = self.client.post(
+            reverse('editar_servicio', args=[self.servicio.pk]),
+            {
+                'titulo': 'Servicio actualizado',
+                'descripcion': 'Descripción actualizada',
+                'precio': '150.00',
+                'categoria': 'Soporte',
+            },
+        )
+
+        self.assertRedirects(response, reverse('servicios'))
+        self.servicio.refresh_from_db()
+        self.assertEqual(self.servicio.titulo, 'Servicio actualizado')
+
+    def test_precio_debe_ser_mayor_a_cero(self):
+        response = self.client.post(reverse('crear_servicio'), {
+            'titulo': 'Servicio inválido',
+            'descripcion': 'Descripción',
+            'precio': '0',
+            'categoria': 'General',
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'El precio debe ser mayor a 0.')
+        self.assertFalse(Servicio.objects.filter(titulo='Servicio inválido').exists())
+
+    def test_eliminar_servicio_requiere_confirmacion_post(self):
+        url = reverse('eliminar_servicio', args=[self.servicio.pk])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(Servicio.objects.filter(pk=self.servicio.pk).exists())
+
+        response = self.client.post(url)
+        self.assertRedirects(response, reverse('servicios'))
+        self.assertFalse(Servicio.objects.filter(pk=self.servicio.pk).exists())
+
+    def test_crear_servicio_requiere_inicio_de_sesion(self):
+        self.client.logout()
+
+        response = self.client.get(reverse('crear_servicio'))
+
+        self.assertRedirects(
+            response,
+            f"{reverse('admin:login')}?next={reverse('crear_servicio')}",
+        )

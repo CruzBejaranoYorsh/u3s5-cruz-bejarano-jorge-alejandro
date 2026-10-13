@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Servicios{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    input, textarea, select { border: 1px solid #94a3b8; border-radius: .5rem; padding: .4rem .6rem; width: 100%; }
+    label { display: block; font-weight: 600; margin-bottom: .2rem; }
+    .errorlist { color: #dc2626; font-size: .9rem; }
+    .helptext { color: #64748b; font-size: .8rem; display: block; }
+  </style>
+</head>
+<body class="max-w-2xl mx-auto py-10 px-6 bg-white text-slate-900">
+  {% block contenido %}{% endblock %}
+</body>
+</html>
