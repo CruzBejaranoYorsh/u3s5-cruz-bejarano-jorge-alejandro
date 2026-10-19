@@ -4,8 +4,8 @@
 <!-- ## : subtítulo de la sección con el enlace a producción -->
 ## Demo en vivo (producción)
 <!-- la URL pública de tu Web Service u3s6-… en Render -->
-[https://u3s6-hernandez-nunez-maria-jose.onrender.com
-](https://u3s5-cruz-bejarano-jorge-alejandro.onrender.com/servicios/)
+https://u3s5-cruz-bejarano-jorge-alejandro.onrender.com/servicios/
+
 <!-- ## : subtítulo con lo que se hizo esta semana -->
 ## Semana 6 — Autenticación, sesiones y seguridad
 Registro, login y logout propios; cada usuario ve y edita solo sus
