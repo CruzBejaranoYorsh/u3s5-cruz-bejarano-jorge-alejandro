@@ -42,9 +42,10 @@ else:
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-local-development-key')
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = config('DEBUG', default=True, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,testserver,.onrender.com', cast=Csv())
 CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='https://*.onrender.com,http://localhost:8000,http://127.0.0.1:8000', cast=Csv())
+USE_REMOTE_DB = config('USE_REMOTE_DB', default=(not DEBUG), cast=bool)
 
 if config('RENDER', default=False, cast=bool):
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -124,7 +125,7 @@ else:
     DB_PASSWORD_VALUE = config('DB_PASSWORD', default='')
     DB_PORT_VALUE = config('DB_PORT', default='3306')
 
-if DB_HOST_VALUE:
+if USE_REMOTE_DB and DB_HOST_VALUE:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
@@ -204,4 +205,5 @@ MAILERS = {
     },
 }
 
-LOGIN_URL = '/admin/login/'
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'servicios'

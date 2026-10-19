@@ -76,5 +76,70 @@ class ServicioCrudTests(TestCase):
 
         self.assertRedirects(
             response,
-            f"{reverse('admin:login')}?next={reverse('crear_servicio')}",
+            f"{reverse('login')}?next={reverse('crear_servicio')}",
         )
+
+    def test_usuario_solo_ve_sus_servicios(self):
+        otro_usuario = User.objects.create_user(
+            username='otro_usuario',
+            password='test-password',
+        )
+        otro_servicio = Servicio.objects.create(
+            propietario=otro_usuario,
+            titulo='Servicio de otra cuenta',
+            descripcion='Descripción privada',
+            precio='75.00',
+            categoria='General',
+        )
+
+        response = self.client.get(reverse('servicios'))
+
+        self.assertContains(response, self.servicio.titulo)
+        self.assertNotContains(response, otro_servicio.titulo)
+
+    def test_usuario_no_puede_editar_servicio_ajeno(self):
+        otro_usuario = User.objects.create_user(
+            username='otro_usuario',
+            password='test-password',
+        )
+        otro_servicio = Servicio.objects.create(
+            propietario=otro_usuario,
+            titulo='Servicio de otra cuenta',
+            descripcion='Descripción privada',
+            precio='75.00',
+            categoria='General',
+        )
+
+        response = self.client.post(
+            reverse('editar_servicio', args=[otro_servicio.pk]),
+            {
+                'titulo': 'Servicio modificado',
+                'descripcion': 'Descripción modificada',
+                'precio': '80.00',
+                'categoria': 'General',
+            },
+        )
+
+        self.assertEqual(response.status_code, 404)
+        otro_servicio.refresh_from_db()
+        self.assertEqual(otro_servicio.titulo, 'Servicio de otra cuenta')
+
+    def test_usuario_no_puede_eliminar_servicio_ajeno(self):
+        otro_usuario = User.objects.create_user(
+            username='otro_usuario',
+            password='test-password',
+        )
+        otro_servicio = Servicio.objects.create(
+            propietario=otro_usuario,
+            titulo='Servicio de otra cuenta',
+            descripcion='Descripción privada',
+            precio='75.00',
+            categoria='General',
+        )
+
+        response = self.client.post(
+            reverse('eliminar_servicio', args=[otro_servicio.pk]),
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(Servicio.objects.filter(pk=otro_servicio.pk).exists())
