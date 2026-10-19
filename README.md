@@ -15,4 +15,5 @@ propios servicios, probado con dos cuentas.
 ## Prueba de aislamiento
 Creé servicios con usuario_a y usuario_b e inicié sesión con cada cuenta.
 Cada usuario solo vio sus propios servicios en el listado.
-Al intentar editar o eliminar el servicio de la otra cuenta, recibí un error 404.
+Al intentar editar o eliminar el servicio de la otra cuenta, recibí un error por parte de django, pues no tenia permiso de acceder
+a su pagina.
