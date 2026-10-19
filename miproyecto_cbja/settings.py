@@ -205,5 +205,7 @@ MAILERS = {
     },
 }
 
+# LOGIN_URL: a dónde manda @login_required a un visitante sin sesión; 'login' es el name= de tu ruta /login/
 LOGIN_URL = 'login'
+# LOGIN_REDIRECT_URL: a dónde va el usuario justo después de iniciar sesión con éxito
 LOGIN_REDIRECT_URL = 'servicios'
